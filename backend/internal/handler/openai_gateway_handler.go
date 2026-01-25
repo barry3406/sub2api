@@ -102,6 +102,14 @@ func (h *OpenAIGatewayHandler) Responses(c *gin.Context) {
 		return
 	}
 
+	// Ensure ops logs include model/body even for early validation exits.
+	setOpsRequestContext(c, reqModel, reqStream, body)
+
+	if apiKey.Group != nil && apiKey.Group.Platform != "" && apiKey.Group.Platform != service.PlatformOpenAI {
+		h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", "Non-OpenAI groups must use /v1/messages")
+		return
+	}
+
 	userAgent := c.GetHeader("User-Agent")
 	if !openai.IsCodexCLIRequest(userAgent) {
 		existingInstructions, _ := reqBody["instructions"].(string)

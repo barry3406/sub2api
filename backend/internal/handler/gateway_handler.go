@@ -185,6 +185,10 @@ func (h *GatewayHandler) Messages(c *gin.Context) {
 	} else if apiKey.Group != nil {
 		platform = apiKey.Group.Platform
 	}
+	if platform == service.PlatformOpenAI {
+		h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", "OpenAI groups must use /openai/v1/responses")
+		return
+	}
 	sessionKey := sessionHash
 	if platform == service.PlatformGemini && sessionHash != "" {
 		sessionKey = "gemini:" + sessionHash

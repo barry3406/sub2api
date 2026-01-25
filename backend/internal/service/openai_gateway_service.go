@@ -1021,10 +1021,8 @@ func (s *OpenAIGatewayService) buildUpstreamRequest(ctx context.Context, c *gin.
 	}
 	if account.Type == AccountTypeOAuth {
 		req.Header.Set("OpenAI-Beta", "responses=experimental")
-		if isCodexCLI {
+		if req.Header.Get("originator") == "" && isCodexCLI {
 			req.Header.Set("originator", "codex_cli_rs")
-		} else {
-			req.Header.Set("originator", "opencode")
 		}
 		req.Header.Set("accept", "text/event-stream")
 		if promptCacheKey != "" {
